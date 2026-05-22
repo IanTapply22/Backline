@@ -5,7 +5,7 @@ module Backline
     class << self
       HISTORY_WINDOWS = [ 7, 30, 90, 180 ].freeze
 
-      def build(days: 30)
+      def build(days: 7)
         days = normalize_days(days)
 
         {
@@ -34,11 +34,10 @@ module Backline
 
       def normalize_days(days)
         value = days.to_i
-        HISTORY_WINDOWS.include?(value) ? value : 30
+        HISTORY_WINDOWS.include?(value) ? value : 7
       end
 
       def summary
-        succeeded_today = Backline::JobExecution.succeeded.where("finished_at >= ?", Time.current.beginning_of_day).count
         workers = Backline::QueueInspector.worker_health
         running = Backline::JobExecution.running.count
         failed = Backline::JobExecution.failed.count
@@ -55,11 +54,9 @@ module Backline
           rate_limited: rate_limited,
           retries: failed,
           processed_total: Backline::JobExecution.succeeded.count + dead,
-          failure_total: failed + dead,
           busy: running,
           workers: workers.size,
           workers_healthy: workers.count { |worker| worker[:healthy] },
-          succeeded_today: succeeded_today,
           active_batches: Backline::BatchRecord.where(status: %w[pending running]).count,
           active_workflows: Backline::WorkflowRecord.where(status: %w[pending running]).count
         }
@@ -106,7 +103,7 @@ module Backline
 
       def batches
         Backline::BatchRecord.order(created_at: :desc).limit(5).map do |batch|
-          total = [batch.total_jobs, 1].max
+          total = [ batch.total_jobs, 1 ].max
 
           {
             id: batch.id,
@@ -123,8 +120,8 @@ module Backline
 
       def workflows
         Backline::WorkflowRecord.includes(:steps).order(created_at: :desc).limit(5).map do |workflow|
-          step_total = [workflow.total_steps, 1].max
-          completed_steps = [workflow.current_step, workflow.total_steps].min
+          step_total = [ workflow.total_steps, 1 ].max
+          completed_steps = [ workflow.current_step, workflow.total_steps ].min
 
           {
             id: workflow.id,
@@ -218,8 +215,7 @@ module Backline
           storage_backend: redis_enabled ? "redis" : "solid_queue",
           redis: {
             configured: redis_enabled,
-            url: redis_enabled ? sanitized_redis_url(redis_url) : nil,
-            note: redis_enabled ? "Redis URL detected from environment." : "Redis not configured for this environment."
+            url: redis_enabled ? sanitized_redis_url(redis_url) : nil
           },
           databases: database_info,
           recurring_configured: recurring_tasks.size

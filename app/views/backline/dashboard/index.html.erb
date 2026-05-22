@@ -9,20 +9,6 @@
   data-backline-dashboard-workflows-path-value="<%= workflows_path %>"
   data-backline-dashboard-interval-value="5000"
 >
-  <header class="hero">
-    <div>
-      <p class="eyebrow">Backline Operations</p>
-      <h1>Operational visibility that feels closer to Sidekiq, but fits this app.</h1>
-      <p class="lede">Queue depth, running work, retry pressure, worker health, batch progress, and workflow state in one live control panel.</p>
-    </div>
-    <div class="hero-actions">
-      <%= link_to "Jobs", jobs_path, class: "button button-primary" %>
-      <%= link_to "Batches", batches_path, class: "button" %>
-      <%= link_to "Workflows", workflows_path, class: "button" %>
-      <%= link_to "Metrics", metrics_path, class: "button" %>
-    </div>
-  </header>
-
   <section class="hero-band card">
     <div class="hero-band-main">
       <div class="beacon-row">
@@ -54,42 +40,26 @@
     <article class="card stat-card">
       <p>Processed</p>
       <strong data-backline-dashboard-target="summaryProcessedTotal"><%= @snapshot[:summary][:processed_total] %></strong>
-      <span>Successful and terminal work</span>
-    </article>
-    <article class="card stat-card">
-      <p>Failures</p>
-      <strong data-backline-dashboard-target="summaryFailureTotal"><%= @snapshot[:summary][:failure_total] %></strong>
-      <span>Retries plus dead jobs</span>
     </article>
     <article class="card stat-card">
       <p>Busy</p>
       <strong data-backline-dashboard-target="summaryRunning"><%= @snapshot[:summary][:running] %></strong>
-      <span>Currently running jobs</span>
     </article>
     <article class="card stat-card">
       <p>Enqueued</p>
       <strong data-backline-dashboard-target="summaryQueued"><%= @snapshot[:summary][:queued] %></strong>
-      <span>Ready to pick up</span>
     </article>
     <article class="card stat-card">
       <p>Retries</p>
       <strong data-backline-dashboard-target="summaryFailed"><%= @snapshot[:summary][:failed] %></strong>
-      <span>Jobs waiting on recovery</span>
     </article>
     <article class="card stat-card">
       <p>Scheduled</p>
       <strong data-backline-dashboard-target="summaryScheduled"><%= @snapshot[:summary][:scheduled] %></strong>
-      <span>Delayed execution</span>
     </article>
     <article class="card stat-card">
       <p>Dead</p>
       <strong data-backline-dashboard-target="summaryDead"><%= @snapshot[:summary][:dead] %></strong>
-      <span>Needs operator attention</span>
-    </article>
-    <article class="card stat-card">
-      <p>Succeeded Today</p>
-      <strong data-backline-dashboard-target="summarySucceededToday"><%= @snapshot[:summary][:succeeded_today] %></strong>
-      <span>Completed since midnight</span>
     </article>
   </section>
 
@@ -108,33 +78,6 @@
     </article>
   </section>
 
-  <section class="quick-links-grid">
-    <article class="card quick-link-card">
-      <p class="eyebrow">Queues</p>
-      <h2>Queue backlog and latency</h2>
-      <p>Open the dedicated queue page for weighted backlog and oldest-job delay.</p>
-      <%= link_to "Open queues", queues_path, class: "button" %>
-    </article>
-    <article class="card quick-link-card">
-      <p class="eyebrow">Workers</p>
-      <h2>Worker heartbeat and health</h2>
-      <p>See which workers are healthy, stale, and when they last checked in.</p>
-      <%= link_to "Open workers", workers_path, class: "button" %>
-    </article>
-    <article class="card quick-link-card">
-      <p class="eyebrow">Failures</p>
-      <h2>Retries and dead jobs</h2>
-      <p>Jump straight into job history filtered to the failure lanes that need review.</p>
-      <%= link_to "Review failures", jobs_path(status: "failed"), class: "button" %>
-    </article>
-    <article class="card quick-link-card">
-      <p class="eyebrow">Recurring</p>
-      <h2>Scheduled recurring tasks</h2>
-      <p>View cron-style task configuration outside the main dashboard home.</p>
-      <%= link_to "Open recurring tasks", recurring_tasks_path, class: "button" %>
-    </article>
-  </section>
-
   <section class="two-column">
     <article class="card chart-card">
       <div class="section-heading">
@@ -147,7 +90,7 @@
     <article class="card chart-card">
       <div class="section-heading">
         <h2>Status Mix</h2>
-        <span>How work is distributed right now</span>
+        <span>Status distributions with ratio  percentages</span>
       </div>
       <div data-backline-dashboard-target="statusDistribution"></div>
     </article>

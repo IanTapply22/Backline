@@ -354,26 +354,24 @@
     return `
       <div class="backend-grid">
         <article class="backend-card">
-          <p>Queue adapter</p>
+          <p>Queue Adapter</p>
           <strong>${escapeHtml(backend.queue_adapter)}</strong>
         </article>
         <article class="backend-card">
-          <p>Storage backend</p>
+          <p>Storage Backend</p>
           <strong>${escapeHtml(backend.storage_backend)}</strong>
         </article>
         <article class="backend-card">
           <p>Redis</p>
-          <strong>${backend.redis.configured ? "configured" : "not configured"}</strong>
-          <span>${escapeHtml(backend.redis.note)}</span>
+          <strong>${backend.redis.configured ? "Configured" : "Not Configured"}</strong>
         </article>
         <article class="backend-card">
-          <p>Recurring tasks</p>
+          <p>Recurring Tasks</p>
           <strong>${backend.recurring_configured}</strong>
-          <span>Configured in recurring.yml</span>
         </article>
       </div>
       <div class="backend-list">
-        <h3>Database connections</h3>
+        <h3>Database Connections</h3>
         <ul class="list compact">
           ${backend.databases.map(function(database) {
             return `
