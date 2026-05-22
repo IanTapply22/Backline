@@ -1,0 +1,33 @@
+<% content_for :title, "Backline Batches" %>
+
+<div class="backline-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Batches</p>
+      <h1>Workflow groups and fan-out tracking</h1>
+    </div>
+  </header>
+
+  <section class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Progress</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @batches.each do |batch| %>
+          <tr>
+            <td><%= link_to batch.name, batch_path(batch) %></td>
+            <td><%= batch.status %></td>
+            <td><%= batch.completed_jobs %> / <%= batch.total_jobs %></td>
+            <td><%= time_ago_in_words(batch.created_at) %> ago</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </section>
+</div>

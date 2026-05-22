@@ -1,0 +1,43 @@
+<% content_for :title, @job.job_class %>
+
+<div class="backline-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow"><%= @job.queue_name %></p>
+      <h1><%= @job.job_class %></h1>
+    </div>
+    <div class="hero-actions">
+      <%= link_to "All jobs", jobs_path, class: "button" %>
+      <% if @job.failed? || @job.dead? %>
+        <%= button_to "Retry job", retry_job_job_path(@job), method: :post, class: "button button-primary" %>
+      <% end %>
+    </div>
+  </header>
+
+  <section class="summary-grid">
+    <article class="card stat-card"><p>Status</p><strong><%= @job.status %></strong></article>
+    <article class="card stat-card"><p>Attempts</p><strong><%= @job.attempts_count %> / <%= @job.max_attempts %></strong></article>
+    <article class="card stat-card"><p>Tenant</p><strong><%= @job.tenant_key.presence || "—" %></strong></article>
+    <article class="card stat-card"><p>User</p><strong><%= @job.user_key.presence || "—" %></strong></article>
+  </section>
+
+  <section class="two-column">
+    <article class="card">
+      <h2>Arguments</h2>
+      <pre><%= JSON.pretty_generate(@job.arguments) %></pre>
+    </article>
+
+    <article class="card">
+      <h2>Metadata</h2>
+      <pre><%= JSON.pretty_generate(@job.metadata) %></pre>
+    </article>
+  </section>
+
+  <% if @job.error_message.present? %>
+    <section class="card">
+      <h2>Failure</h2>
+      <p><strong><%= @job.error_class %></strong>: <%= @job.error_message %></p>
+      <pre><%= @job.error_backtrace %></pre>
+    </section>
+  <% end %>
+</div>

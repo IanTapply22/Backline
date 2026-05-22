@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Backline" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "backline/application", media: "all" %>
+    <%= javascript_include_tag "backline/chart.umd.min", defer: true %>
+    <%= javascript_include_tag "backline/dashboard", defer: true %>
+  </head>
+
+  <body>
+    <nav class="backline-topbar">
+      <div class="backline-topbar-inner">
+        <%= link_to "Backline", root_path, class: "wordmark" %>
+        <div class="topbar-links">
+          <%= link_to "Dashboard", root_path %>
+          <%= link_to "Jobs", jobs_path %>
+          <%= link_to "Queues", queues_path %>
+          <%= link_to "Workers", workers_path %>
+          <%= link_to "Recurring", recurring_tasks_path %>
+          <%= link_to "Batches", batches_path %>
+          <%= link_to "Workflows", workflows_path %>
+          <%= link_to "Metrics", metrics_path %>
+        </div>
+      </div>
+    </nav>
+
+    <% if flash[:notice].present? || flash[:alert].present? %>
+      <div class="backline-shell flash-stack">
+        <% flash.each do |type, message| %>
+          <p class="flash flash-<%= type %>"><%= message %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= yield %>
+  </body>
+</html>

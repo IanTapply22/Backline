@@ -1,0 +1,15 @@
+default: &default
+  queues:
+    critical: 5
+    default: 3
+    low: 1
+  lease_duration_seconds: 300
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default

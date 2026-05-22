@@ -1,0 +1,42 @@
+<% content_for :title, "Backline Queues" %>
+
+<div class="backline-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Queues</p>
+      <h1>Backlog and latency by queue</h1>
+    </div>
+    <%= link_to "Dashboard", root_path, class: "button" %>
+  </header>
+
+  <section class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Queue</th>
+            <th>Queued</th>
+            <th>Weight</th>
+            <th>Latency</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if @queues.any? %>
+            <% @queues.each do |queue| %>
+              <tr>
+                <td><%= queue[:name] %></td>
+                <td><%= queue[:queued] %></td>
+                <td><%= queue[:weight] %></td>
+                <td><%= distance_of_time_in_words(Time.current, Time.current + queue[:latency_seconds].seconds) %></td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="4">No queues currently have pending jobs.</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,10 @@
+class <%= class_name %>Job
+  include Backline::Job
+
+  queue :default
+  retries 3
+
+  def perform(*args)
+    # Do something useful here.
+  end
+end

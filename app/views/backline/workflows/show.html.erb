@@ -1,0 +1,37 @@
+<% content_for :title, @workflow.name %>
+
+<div class="backline-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Workflow</p>
+      <h1><%= @workflow.name %></h1>
+    </div>
+  </header>
+
+  <section class="summary-grid">
+    <article class="card stat-card"><p>Status</p><strong><%= @workflow.status %></strong></article>
+    <article class="card stat-card"><p>Current step</p><strong><%= @workflow.current_step %></strong></article>
+    <article class="card stat-card"><p>Total steps</p><strong><%= @workflow.total_steps %></strong></article>
+  </section>
+
+  <section class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Position</th>
+          <th>Job class</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @workflow.steps.order(:position).each do |step| %>
+          <tr>
+            <td><%= step.position %></td>
+            <td><%= step.job_class %></td>
+            <td><%= step.status %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </section>
+</div>

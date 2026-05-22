@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "backline"
+
+Backline::Cli.start(ARGV)

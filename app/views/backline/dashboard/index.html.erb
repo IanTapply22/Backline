@@ -1,0 +1,221 @@
+<% content_for :title, "Backline Dashboard" %>
+
+<div
+  class="backline-shell"
+  data-backline-dashboard
+  data-backline-dashboard-url-value="<%= live_dashboard_path(days: @snapshot[:charts][:history][:days]) %>"
+  data-backline-dashboard-jobs-path-value="<%= jobs_path %>"
+  data-backline-dashboard-batches-path-value="<%= batches_path %>"
+  data-backline-dashboard-workflows-path-value="<%= workflows_path %>"
+  data-backline-dashboard-interval-value="5000"
+>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Backline Operations</p>
+      <h1>Operational visibility that feels closer to Sidekiq, but fits this app.</h1>
+      <p class="lede">Queue depth, running work, retry pressure, worker health, batch progress, and workflow state in one live control panel.</p>
+    </div>
+    <div class="hero-actions">
+      <%= link_to "Jobs", jobs_path, class: "button button-primary" %>
+      <%= link_to "Batches", batches_path, class: "button" %>
+      <%= link_to "Workflows", workflows_path, class: "button" %>
+      <%= link_to "Metrics", metrics_path, class: "button" %>
+    </div>
+  </header>
+
+  <section class="hero-band card">
+    <div class="hero-band-main">
+      <div class="beacon-row">
+        <span id="backline-beacon" class="beacon" aria-hidden="true"></span>
+        <p class="eyebrow">Live Update</p>
+      </div>
+      <strong class="live-time" data-backline-dashboard-target="generatedAt"><%= Time.current.strftime("%H:%M:%S") %></strong>
+      <p class="hero-note">Dashboard refreshes automatically without reloading the page.</p>
+    </div>
+
+    <div class="hero-meta">
+      <div class="mini-pills">
+        <span class="mini-pill queued">Queued <strong data-backline-dashboard-target="summaryQueued"><%= @snapshot[:summary][:queued] %></strong></span>
+        <span class="mini-pill running">Busy <strong data-backline-dashboard-target="summaryRunning"><%= @snapshot[:summary][:running] %></strong></span>
+        <span class="mini-pill failed">Retries <strong data-backline-dashboard-target="summaryFailed"><%= @snapshot[:summary][:failed] %></strong></span>
+      </div>
+
+      <label class="polling-control" for="backline-refresh-interval">
+        <span>Polling interval</span>
+        <div class="polling-control-row">
+          <input id="backline-refresh-interval" type="range" min="2000" max="20000" step="1000" value="5000" data-backline-dashboard-target="intervalSlider">
+          <strong data-backline-dashboard-target="intervalLabel">5 s</strong>
+        </div>
+      </label>
+    </div>
+  </section>
+
+  <section class="summary-grid summary-grid-wide">
+    <article class="card stat-card">
+      <p>Processed</p>
+      <strong data-backline-dashboard-target="summaryProcessedTotal"><%= @snapshot[:summary][:processed_total] %></strong>
+      <span>Successful and terminal work</span>
+    </article>
+    <article class="card stat-card">
+      <p>Failures</p>
+      <strong data-backline-dashboard-target="summaryFailureTotal"><%= @snapshot[:summary][:failure_total] %></strong>
+      <span>Retries plus dead jobs</span>
+    </article>
+    <article class="card stat-card">
+      <p>Busy</p>
+      <strong data-backline-dashboard-target="summaryRunning"><%= @snapshot[:summary][:running] %></strong>
+      <span>Currently running jobs</span>
+    </article>
+    <article class="card stat-card">
+      <p>Enqueued</p>
+      <strong data-backline-dashboard-target="summaryQueued"><%= @snapshot[:summary][:queued] %></strong>
+      <span>Ready to pick up</span>
+    </article>
+    <article class="card stat-card">
+      <p>Retries</p>
+      <strong data-backline-dashboard-target="summaryFailed"><%= @snapshot[:summary][:failed] %></strong>
+      <span>Jobs waiting on recovery</span>
+    </article>
+    <article class="card stat-card">
+      <p>Scheduled</p>
+      <strong data-backline-dashboard-target="summaryScheduled"><%= @snapshot[:summary][:scheduled] %></strong>
+      <span>Delayed execution</span>
+    </article>
+    <article class="card stat-card">
+      <p>Dead</p>
+      <strong data-backline-dashboard-target="summaryDead"><%= @snapshot[:summary][:dead] %></strong>
+      <span>Needs operator attention</span>
+    </article>
+    <article class="card stat-card">
+      <p>Succeeded Today</p>
+      <strong data-backline-dashboard-target="summarySucceededToday"><%= @snapshot[:summary][:succeeded_today] %></strong>
+      <span>Completed since midnight</span>
+    </article>
+  </section>
+
+  <section class="summary-grid">
+    <article class="card stat-card stat-card-compact">
+      <p>Rate Limited</p>
+      <strong data-backline-dashboard-target="summaryRateLimited"><%= @snapshot[:summary][:rate_limited] %></strong>
+    </article>
+    <article class="card stat-card stat-card-compact">
+      <p>Active Batches</p>
+      <strong data-backline-dashboard-target="summaryActiveBatches"><%= @snapshot[:summary][:active_batches] %></strong>
+    </article>
+    <article class="card stat-card stat-card-compact">
+      <p>Active Workflows</p>
+      <strong data-backline-dashboard-target="summaryActiveWorkflows"><%= @snapshot[:summary][:active_workflows] %></strong>
+    </article>
+  </section>
+
+  <section class="quick-links-grid">
+    <article class="card quick-link-card">
+      <p class="eyebrow">Queues</p>
+      <h2>Queue backlog and latency</h2>
+      <p>Open the dedicated queue page for weighted backlog and oldest-job delay.</p>
+      <%= link_to "Open queues", queues_path, class: "button" %>
+    </article>
+    <article class="card quick-link-card">
+      <p class="eyebrow">Workers</p>
+      <h2>Worker heartbeat and health</h2>
+      <p>See which workers are healthy, stale, and when they last checked in.</p>
+      <%= link_to "Open workers", workers_path, class: "button" %>
+    </article>
+    <article class="card quick-link-card">
+      <p class="eyebrow">Failures</p>
+      <h2>Retries and dead jobs</h2>
+      <p>Jump straight into job history filtered to the failure lanes that need review.</p>
+      <%= link_to "Review failures", jobs_path(status: "failed"), class: "button" %>
+    </article>
+    <article class="card quick-link-card">
+      <p class="eyebrow">Recurring</p>
+      <h2>Scheduled recurring tasks</h2>
+      <p>View cron-style task configuration outside the main dashboard home.</p>
+      <%= link_to "Open recurring tasks", recurring_tasks_path, class: "button" %>
+    </article>
+  </section>
+
+  <section class="two-column">
+    <article class="card chart-card">
+      <div class="section-heading">
+        <h2>Execution Throughput</h2>
+        <span>Last 12 hours</span>
+      </div>
+      <div data-backline-dashboard-target="throughput"></div>
+    </article>
+
+    <article class="card chart-card">
+      <div class="section-heading">
+        <h2>Status Mix</h2>
+        <span>How work is distributed right now</span>
+      </div>
+      <div data-backline-dashboard-target="statusDistribution"></div>
+    </article>
+  </section>
+
+  <section class="card chart-card dashboard-history">
+    <div class="section-heading">
+      <h2>History</h2>
+      <div class="history-filters">
+        <% [7, 30, 90, 180].each do |days| %>
+          <%= link_to "#{days}d", root_path(days: days), class: "history-filter#{' active' if @snapshot[:charts][:history][:days] == days}" %>
+        <% end %>
+      </div>
+    </div>
+    <div data-backline-dashboard-target="history">
+      <div class="chart-loading">Loading history chart…</div>
+    </div>
+  </section>
+
+  <section class="two-column">
+    <article class="card">
+      <div class="section-heading">
+        <h2>Batches</h2>
+        <span>Recent grouped fan-out work</span>
+      </div>
+      <ul class="list" data-backline-dashboard-target="batches">
+        <% @snapshot[:batches].each do |batch| %>
+          <li>
+            <div class="list-row">
+              <%= link_to batch[:name], batch_path(batch[:id]) %>
+              <span class="pill pill-<%= batch[:status] %>"><%= batch[:status] %></span>
+            </div>
+            <span><%= batch[:completed_jobs] %> complete, <%= batch[:failed_jobs] %> failed, <%= batch[:total_jobs] %> total</span>
+            <div class="queue-depth-track">
+              <span class="queue-depth-fill" style="width:<%= batch[:progress_percentage] %>%"></span>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </article>
+
+    <article class="card">
+      <div class="section-heading">
+        <h2>Workflows</h2>
+        <span>Recent chained execution state</span>
+      </div>
+      <ul class="list" data-backline-dashboard-target="workflows">
+        <% @snapshot[:workflows].each do |workflow| %>
+          <li>
+            <div class="list-row">
+              <%= link_to workflow[:name], workflow_path(workflow[:id]) %>
+              <span class="pill pill-<%= workflow[:status] %>"><%= workflow[:status] %></span>
+            </div>
+            <span><%= workflow[:completed_steps] %> completed of <%= workflow[:total_steps] %> steps</span>
+            <div class="queue-depth-track">
+              <span class="queue-depth-fill" style="width:<%= workflow[:progress_percentage] %>%"></span>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </article>
+  </section>
+
+  <section class="card dashboard-footer-card">
+    <div class="section-heading">
+      <h2>Backend Telemetry</h2>
+      <span>Adapter, storage, Redis, and database wiring</span>
+    </div>
+    <div data-backline-dashboard-target="backend"></div>
+  </section>
+</div>

@@ -1,0 +1,35 @@
+<% content_for :title, "Backline Workers" %>
+
+<div class="backline-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Workers</p>
+      <h1>Heartbeat and process health</h1>
+    </div>
+    <%= link_to "Dashboard", root_path, class: "button" %>
+  </header>
+
+  <section class="card">
+    <ul class="list">
+      <% if @workers.any? %>
+        <% @workers.each do |worker| %>
+          <li>
+            <div class="list-row">
+              <strong><%= worker[:name] %></strong>
+              <span class="pill pill-<%= worker[:healthy] ? "succeeded" : "failed" %>"><%= worker[:healthy] ? "healthy" : "stale" %></span>
+            </div>
+            <span><%= worker[:kind] %> on <%= worker[:hostname] %> pid <%= worker[:pid] %></span>
+            <% if worker[:heartbeat_at].present? %>
+              <span>Last heartbeat <%= time_ago_in_words(worker[:heartbeat_at]) %> ago</span>
+            <% end %>
+          </li>
+        <% end %>
+      <% else %>
+        <li>
+          <strong>No workers reported</strong>
+          <span>Start <code>bin/backline</code> to stream worker heartbeats.</span>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+</div>

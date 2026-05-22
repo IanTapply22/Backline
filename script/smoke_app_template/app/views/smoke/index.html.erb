@@ -1,0 +1,69 @@
+<div style="max-width: 1100px; margin: 40px auto; font-family: system-ui, sans-serif;">
+  <h1 style="margin-bottom: 8px;">Backline Playground</h1>
+  <p style="margin-top: 0; color: #555;">
+    Use these buttons to create demo jobs, then inspect them in
+    <a href="/backline">the Backline dashboard</a>.
+  </p>
+
+  <% if flash[:notice].present? %>
+    <p style="background: #e7f7ee; color: #155d3b; padding: 12px 14px; border-radius: 12px;"><%= flash[:notice] %></p>
+  <% end %>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 24px 0;">
+    <% {
+      queued: @counts["queued"].to_i,
+      scheduled: @counts["scheduled"].to_i,
+      running: @counts["running"].to_i,
+      failed: @counts["failed"].to_i,
+      dead: @counts["dead"].to_i,
+      succeeded: @counts["succeeded"].to_i
+    }.each do |label, value| %>
+      <div style="padding: 18px; border: 1px solid #ddd; border-radius: 16px; background: #fff;">
+        <div style="font-size: 13px; color: #666; text-transform: uppercase;"><%= label %></div>
+        <div style="font-size: 32px; font-weight: 700;"><%= value %></div>
+      </div>
+    <% end %>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+    <section style="padding: 20px; border: 1px solid #ddd; border-radius: 16px; background: #fff;">
+      <h2>Basic Queue Tests</h2>
+      <p>Exercise default, critical, and scheduled jobs.</p>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <%= button_to "Queue default job", smoke_default_path, method: :post %>
+        <%= button_to "Queue critical job", smoke_critical_path, method: :post %>
+        <%= button_to "Queue scheduled job", smoke_scheduled_path, method: :post %>
+      </div>
+    </section>
+
+    <section style="padding: 20px; border: 1px solid #ddd; border-radius: 16px; background: #fff;">
+      <h2>Failure + Recovery</h2>
+      <p>Push a job that fails on purpose so retries and dead-letter behavior are visible.</p>
+      <%= button_to "Queue failing job", smoke_failure_path, method: :post %>
+    </section>
+
+    <section style="padding: 20px; border: 1px solid #ddd; border-radius: 16px; background: #fff;">
+      <h2>Unique Jobs</h2>
+      <p>Try to enqueue the same job three times and verify only one active unique execution is retained.</p>
+      <%= button_to "Queue duplicate unique jobs", smoke_unique_path, method: :post %>
+    </section>
+
+    <section style="padding: 20px; border: 1px solid #ddd; border-radius: 16px; background: #fff;">
+      <h2>Rate Limiting</h2>
+      <p>Enqueue five jobs that share the same rate-limit key so some are deferred.</p>
+      <%= button_to "Queue rate-limited jobs", smoke_rate_limited_path, method: :post %>
+    </section>
+
+    <section style="padding: 20px; border: 1px solid #ddd; border-radius: 16px; background: #fff;">
+      <h2>Batches</h2>
+      <p>Create a small batch and confirm it appears in the Backline batches view.</p>
+      <%= button_to "Queue batch", smoke_batch_path, method: :post %>
+    </section>
+
+    <section style="padding: 20px; border: 1px solid #ddd; border-radius: 16px; background: #fff;">
+      <h2>Workflows</h2>
+      <p>Create a chained workflow with jobs across multiple queues.</p>
+      <%= button_to "Queue workflow", smoke_workflow_path, method: :post %>
+    </section>
+  </div>
+</div>

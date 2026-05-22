@@ -1,0 +1,8 @@
+require "test_helper"
+
+class <%= class_name %>JobTest < ActiveSupport::TestCase
+  test "job class is configured" do
+    assert_equal "default", <%= class_name %>Job.backline_queue_name
+    assert_equal 3, <%= class_name %>Job.backline_retry_limit
+  end
+end

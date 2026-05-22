@@ -1,0 +1,33 @@
+<% content_for :title, "Backline Workflows" %>
+
+<div class="backline-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Workflows</p>
+      <h1>Chained jobs with step progression</h1>
+    </div>
+  </header>
+
+  <section class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Step</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @workflows.each do |workflow| %>
+          <tr>
+            <td><%= link_to workflow.name, workflow_path(workflow) %></td>
+            <td><%= workflow.status %></td>
+            <td><%= workflow.current_step %> / <%= workflow.total_steps %></td>
+            <td><%= time_ago_in_words(workflow.created_at) %> ago</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </section>
+</div>

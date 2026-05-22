@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
+
+require "bundler/setup"
+require "backline"
+
+Backline::Cli.start(ARGV, root: File.expand_path("..", __dir__))

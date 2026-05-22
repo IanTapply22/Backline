@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TARGET_DIR="${1:-/tmp/backline-smoke}"
+BACKLINE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TARGET_PARENT="$(dirname "$TARGET_DIR")"
+TARGET_NAME="$(basename "$TARGET_DIR")"
+SMOKE_TEMPLATE_ROOT="$BACKLINE_ROOT/script/smoke_app_template"
+
+rm -rf "$TARGET_DIR"
+(cd "$TARGET_PARENT" && rails new "$TARGET_NAME" --database=sqlite3 --skip-javascript --skip-hotwire --skip-kamal)
+
+cat <<EOF >> "$TARGET_DIR/Gemfile"
+gem "backline", path: "$BACKLINE_ROOT"
+EOF
+
+cd "$TARGET_DIR"
+bundle install
+bin/rails generate backline:install
+bin/rails db:prepare
+bin/rails db:schema:load:cache
+bin/rails db:schema:load:queue
+bin/rails db:schema:load:cable
+bin/rails generate backline:job demo
+
+mkdir -p app/controllers app/views/smoke app/jobs/smoke
+cp -R "$SMOKE_TEMPLATE_ROOT/app/." app/
+cp -R "$SMOKE_TEMPLATE_ROOT/config/environments/." config/environments/
+cp "$SMOKE_TEMPLATE_ROOT/config/database.yml" config/database.yml
+
+ruby - <<'RUBY'
+routes_path = "config/routes.rb"
+routes = File.read(routes_path)
+smoke_routes = <<~CODE
+  root "smoke#index"
+  post "smoke/default", to: "smoke#enqueue_default", as: :smoke_default
+  post "smoke/critical", to: "smoke#enqueue_critical", as: :smoke_critical
+  post "smoke/scheduled", to: "smoke#enqueue_scheduled", as: :smoke_scheduled
+  post "smoke/failure", to: "smoke#enqueue_failure", as: :smoke_failure
+  post "smoke/unique", to: "smoke#enqueue_unique", as: :smoke_unique
+  post "smoke/rate-limited", to: "smoke#enqueue_rate_limited", as: :smoke_rate_limited
+  post "smoke/batch", to: "smoke#enqueue_batch", as: :smoke_batch
+  post "smoke/workflow", to: "smoke#enqueue_workflow", as: :smoke_workflow
+CODE
+
+unless routes.include?('root "smoke#index"')
+  routes.sub!("Rails.application.routes.draw do\n", "Rails.application.routes.draw do\n#{smoke_routes}\n")
+  File.write(routes_path, routes)
+end
+RUBY
+
+cat <<EOF
+
+Smoke app ready.
+Run these in another terminal:
+  cd "$TARGET_DIR"
+  bin/rails server
+  bin/backline
+
+Then open:
+  http://localhost:3000/
+  http://localhost:3000/backline
+EOF
