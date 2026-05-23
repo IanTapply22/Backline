@@ -17,16 +17,15 @@ EOF
 cd "$TARGET_DIR"
 bundle install
 bin/rails generate backline:install
-bin/rails db:prepare
-bin/rails db:schema:load:cache
-bin/rails db:schema:load:queue
-bin/rails db:schema:load:cable
-bin/rails generate backline:job demo
-
 mkdir -p app/controllers app/views/smoke app/jobs/smoke
 cp -R "$SMOKE_TEMPLATE_ROOT/app/." app/
 cp -R "$SMOKE_TEMPLATE_ROOT/config/environments/." config/environments/
 cp "$SMOKE_TEMPLATE_ROOT/config/database.yml" config/database.yml
+
+bin/rails db:prepare
+bin/rails db:schema:load:queue
+bin/rails db:schema:load:cable
+bin/rails generate backline:job demo
 
 ruby - <<'RUBY'
 routes_path = "config/routes.rb"

@@ -8,6 +8,9 @@
     </div>
     <div class="hero-actions">
       <%= link_to "All jobs", jobs_path, class: "button" %>
+      <% if @job.killable? %>
+        <%= button_to "Kill job", kill_job_job_path(@job), method: :post, class: "button button-danger" %>
+      <% end %>
       <% if @job.failed? || @job.dead? %>
         <%= button_to "Retry job", retry_job_job_path(@job), method: :post, class: "button button-primary" %>
       <% end %>

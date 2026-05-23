@@ -14,6 +14,16 @@ class Backline::JobsController < Backline::ApplicationController
     redirect_to job_path(job), notice: "Job requeued."
   end
 
+  def kill_job
+    job = Backline::JobExecution.find(params[:id])
+
+    if job.kill!
+      redirect_back fallback_location: job_path(job), notice: "Job killed."
+    else
+      redirect_back fallback_location: job_path(job), alert: "Job could not be killed."
+    end
+  end
+
   private
 
   def filter_params

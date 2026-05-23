@@ -9,6 +9,9 @@ class Backline::RunnerJob < ActiveJob::Base
     execution.start_processing!
     job_class = execution.job_klass
     job_class.new.perform(*execution.arguments)
+    execution.reload
+    return if execution.finished?
+
     execution.mark_succeeded!
     execution.batch&.record_completion!
     execution.workflow&.advance_from!(execution)
@@ -22,6 +25,9 @@ class Backline::RunnerJob < ActiveJob::Base
 
   def handle_failure(execution, error)
     raise error unless execution
+
+    execution.reload
+    return if execution.finished?
 
     execution.mark_failed!(error)
 

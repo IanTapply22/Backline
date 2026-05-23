@@ -1,21 +1,6 @@
 # Local Testing
 
-Backline is easiest to smoke-test in two modes:
-
-## 1. Dogfood this repo as the demo host app
-
-```bash
-bin/rails db:migrate
-bin/rails db:schema:load:cache
-bin/rails db:schema:load:queue
-bin/rails db:schema:load:cable
-bin/rails server
-bin/backline
-```
-
-Then open `http://localhost:3000/backline`.
-
-## 2. Test the real install flow in a disposable Rails app
+Backline is easiest to smoke-test by exercising the real install flow in a disposable Rails app:
 
 ```bash
 ./script/test-install /tmp/backline-smoke
@@ -42,13 +27,14 @@ The smoke playground gives you one-click demo requests for:
 
 That script generates a fresh Rails app, installs Backline from this checkout via a local path gem, runs the installer, migrates the database, and copies in the playground controller, views, and demo jobs.
 If you want to run the installer manually, use `bin/rails generate backline:install`.
-If you hit missing `solid_queue_*` tables, explicitly load the extra schemas in the host app:
+If you hit missing `solid_queue_*` or `solid_cable_*` tables, make sure the host app defines `queue` and `cable` databases in `config/database.yml`, then explicitly load those schemas:
 
 ```bash
 bin/rails db:prepare
-bin/rails db:schema:load:cache
 bin/rails db:schema:load:queue
 bin/rails db:schema:load:cable
 ```
 
-Backline depends on Solid Queue's schema being loaded into the `queue` database, not just Backline's own migration.
+If the host app also defines a separate `cache` database, load that with `bin/rails db:schema:load:cache`.
+
+This repo's default development config does not define separate `cache`, `queue`, or `cable` databases, so those named schema-load tasks only exist in apps that add those database entries.

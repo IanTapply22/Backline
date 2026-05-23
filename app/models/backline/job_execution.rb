@@ -34,6 +34,10 @@ class Backline::JobExecution < ApplicationRecord
     finished_at.present? || succeeded? || dead?
   end
 
+  def killable?
+    !succeeded? && !dead?
+  end
+
   def job_klass
     job_class.constantize
   end
@@ -84,6 +88,28 @@ class Backline::JobExecution < ApplicationRecord
       status: "dead",
       finished_at: Time.current
     )
+  end
+
+  def kill!(reason: "Killed from Backline UI")
+    return false unless killable?
+
+    ActiveRecord::Base.transaction do
+      update!(
+        status: "dead",
+        finished_at: Time.current,
+        scheduled_at: nil,
+        available_at: nil,
+        lease_expires_at: nil,
+        error_class: "Backline::JobKilled",
+        error_message: reason
+      )
+
+      unique_lock&.destroy!
+      batch&.record_failure!
+      workflow&.fail_from!(self)
+    end
+
+    true
   end
 
   def requeue!

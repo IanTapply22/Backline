@@ -3,6 +3,7 @@ Backline::Engine.routes.draw do
   get "dashboard/live", to: "dashboard#live", as: :live_dashboard
 
   resources :jobs, only: [ :index, :show ] do
+    post :kill_job, on: :member
     post :retry_job, on: :member
   end
 

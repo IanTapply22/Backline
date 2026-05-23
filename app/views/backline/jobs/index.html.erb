@@ -4,9 +4,8 @@
   <header class="page-header">
     <div>
       <p class="eyebrow">Jobs</p>
-      <h1>Searchable execution history</h1>
+      <h1>Searchable Execution History</h1>
     </div>
-    <%= link_to "Dashboard", root_path, class: "button" %>
   </header>
 
   <%= form_with url: jobs_path, method: :get, class: "filters" do |form| %>
@@ -20,29 +19,48 @@
   <% end %>
 
   <section class="card">
-    <table>
-      <thead>
-        <tr>
-          <th>Class</th>
-          <th>Status</th>
-          <th>Queue</th>
-          <th>Tenant</th>
-          <th>User</th>
-          <th>Created</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @jobs.each do |job| %>
+    <div class="table-wrap">
+      <table class="jobs-table">
+        <thead>
           <tr>
-            <td><%= link_to job.job_class, job_path(job) %></td>
-            <td><span class="pill pill-<%= job.status %>"><%= job.status %></span></td>
-            <td><%= job.queue_name %></td>
-            <td><%= job.tenant_key.presence || "—" %></td>
-            <td><%= job.user_key.presence || "—" %></td>
-            <td><%= time_ago_in_words(job.created_at) %> ago</td>
+            <th>Class</th>
+            <th>Status</th>
+            <th>Queue</th>
+            <th>Tenant</th>
+            <th>User</th>
+            <th>Created</th>
+            <th>Actions</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody data-backline-jobs-target="rows">
+          <% @jobs.each do |job| %>
+            <tr>
+              <td><%= link_to job.job_class, job_path(job) %></td>
+              <td><span class="pill pill-<%= job.status %>"><%= job.status %></span></td>
+              <td><%= job.queue_name %></td>
+              <td><%= job.tenant_key.presence || "—" %></td>
+              <td><%= job.user_key.presence || "—" %></td>
+              <td>
+                <div class="jobs-timestamp" data-backline-local-time="<%= job.created_at&.iso8601 %>">
+                  <strong><%= job.created_at&.strftime("%b %-d, %Y %H:%M:%S") %></strong>
+                  <span><%= time_ago_in_words(job.created_at) %> ago</span>
+                </div>
+              </td>
+              <td>
+                <div class="table-actions">
+                  <%= link_to "Open", job_path(job), class: "button button-small" %>
+                  <% if job.failed? || job.dead? %>
+                    <%= button_to "Retry", retry_job_job_path(job), method: :post, class: "button button-small button-primary", form: { class: "inline-form" } %>
+                  <% end %>
+                  <% if job.killable? %>
+                    <%= button_to "Kill", kill_job_job_path(job), method: :post, class: "button button-small button-danger", form: { class: "inline-form" } %>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   </section>
 </div>
